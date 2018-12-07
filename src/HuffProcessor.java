@@ -69,9 +69,7 @@ public class HuffProcessor {
 				break;
 			}
 			String code = codings[inBits];
-			if(code != null) {
 			out.writeBits(code.length(), Integer.parseInt(code, 2));
-			}
 		}
 		String code = codings[PSEUDO_EOF];
 		out.writeBits(code.length(), Integer.parseInt(code, 2));
@@ -81,9 +79,12 @@ public class HuffProcessor {
 		if(root == null) {
 			return;
 		}
-		if(root.myLeft != null || root.myRight != null) {
+		if(root.myLeft != null)  {
 			out.writeBits(1, 0);
 			writeHeader(root.myLeft, out);
+		}
+			if(root.myRight != null) {
+				out.writeBits(1, 0);
 			writeHeader(root.myRight, out);
 		}
 		else {
