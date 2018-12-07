@@ -98,10 +98,12 @@ public class HuffProcessor {
 			return;
 		}
 		if(root.myLeft != null) {
-			codingHelper(root.myLeft, path + "0", encodings);
+			path = path + "0";
+			codingHelper(root.myLeft, path, encodings);
 		}
 		if(root.myRight != null) {
-			codingHelper(root.myRight, path + "1", encodings);
+			path = path + "1";
+			codingHelper(root.myRight, path, encodings);
 		}
 	}
 
