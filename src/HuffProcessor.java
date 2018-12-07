@@ -53,23 +53,14 @@ public class HuffProcessor {
 		in.reset();
 		writeCompressedBits(codings, in, out);
 		out.close();
-
-		/*while (true){
-			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
-			out.writeBits(BITS_PER_WORD, val);
-		}
-		out.close();*/
 	}
 
 	private void writeCompressedBits(String[] codings, BitInputStream in, BitOutputStream out) {
-		while(true) {
-			int inBits = in.readBits(BITS_PER_WORD);
-			if(inBits == -1) {
-				break;
-			}
+		int inBits = in.readBits(BITS_PER_WORD);
+		while(inBits != -1) {
 			String code = codings[inBits];
 			out.writeBits(code.length(), Integer.parseInt(code, 2));
+			inBits = in.readBits(BITS_PER_WORD);
 		}
 		String codePseudo = codings[PSEUDO_EOF];
 		out.writeBits(codePseudo.length(), Integer.parseInt(codePseudo, 2));
@@ -86,7 +77,7 @@ public class HuffProcessor {
 		}
 		else {
 			out.writeBits(1, 1);
-			out.writeBits(9, root.myValue);
+			out.writeBits(BITS_PER_WORD + 1, root.myValue);
 			return;
 		}
 
@@ -107,12 +98,10 @@ public class HuffProcessor {
 			return;
 		}
 		if(root.myLeft != null) {
-			path = path + "0";
-			codingHelper(root.myLeft, path, encodings);
+			codingHelper(root.myLeft, path + "0", encodings);
 		}
 		if(root.myRight != null) {
-			path = path + "1";
-			codingHelper(root.myRight, path, encodings);
+			codingHelper(root.myRight, path + "1", encodings);
 		}
 	}
 
@@ -171,13 +160,8 @@ public class HuffProcessor {
 		HuffNode root = readTreeHeader(in);
 		readCompressedBits(root, in, out);
 		out.close();
-		/*while (true){
-			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
-			out.writeBits(BITS_PER_WORD, val);
-		}
-		out.close();*/
 	}	
+	
 	private HuffNode readTreeHeader(BitInputStream in) {
 		int singleBit = in.readBits(1); //read a singleBit
 		if(singleBit == -1) {
@@ -189,7 +173,7 @@ public class HuffProcessor {
 			return new HuffNode(0, 0, left, right);
 		}
 		else {
-			int nineBitValue = in.readBits(9); //read bits_per_word + 1
+			int nineBitValue = in.readBits(BITS_PER_WORD + 1); //read bits_per_word + 1
 			return new HuffNode(nineBitValue, 0, null, null);
 		}
 	}
