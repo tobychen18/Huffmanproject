@@ -69,7 +69,9 @@ public class HuffProcessor {
 				break;
 			}
 			String code = codings[inBits];
-			out.writeBits(code.length(), Integer.parseInt(code, 2));
+			if(code!= null) {
+				out.writeBits(code.length(), Integer.parseInt(code, 2));
+			}
 		}
 		String code = codings[PSEUDO_EOF];
 		out.writeBits(code.length(), Integer.parseInt(code, 2));
@@ -79,12 +81,9 @@ public class HuffProcessor {
 		if(root == null) {
 			return;
 		}
-		if(root.myLeft != null)  {
+		if(root.myLeft != null || root.myRight != null)  {
 			out.writeBits(1, 0);
 			writeHeader(root.myLeft, out);
-		}
-			if(root.myRight != null) {
-			out.writeBits(1, 0);
 			writeHeader(root.myRight, out);
 		}
 		else {
@@ -97,7 +96,7 @@ public class HuffProcessor {
 
 	private String[] makeCodingsFromTree(HuffNode root) {
 		String[] encodings = new String[ALPH_SIZE+1];
-		codingHelper(root, "", encodings);
+		codingHelper(root,"", encodings);
 		return encodings;
 	}
 
@@ -146,7 +145,7 @@ public class HuffProcessor {
 			if(value == -1) {
 				break;
 			}
-			counts[value]+=1;
+			counts[value]++;
 		}
 		return counts;
 	}
